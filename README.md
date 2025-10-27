@@ -1,13 +1,32 @@
 ## Using this repository
-The repository contains my PhD thesis and the corresponding code and papers for Studies I–IV at Karolinska Institutet.
-Author: Enoch Yi-Tung Chen
-Title: "Extrapolating survival with applications to health technology assessment"
-doi: https://doi.org/10.69622/28869155
-Dissertation date: 11 September 2025
-Study I: Chen EYT, Leontyeva Y, Lin CN, Wang JD, Clements MS, Dickman PW. Comparing survival extrapolation within all-cause and relative survival frameworks by standard parametric models and flexible parametric spline models using the Swedish Cancer Registry. Medical Decision Making. 2024, Vol. 44(3) 269–282.
-Study II: Chen EYT, Dickman PW, Clements MS. A multistate model incorporating relative survival extrapolation and mixed time scales for health technology assessment. PharmacoEconomics. 2025; 43:297–310.
-Study III: Chen EYT, Dahlén T, Stenke L, Björkholm M, Hao S, Dickman PW, Clements MS. Loss in overall and quality-adjusted life expectancy for patients with chronic phase chronic myeloid leukemia. European Journal of Haematology. 2025; 114:334–342.
-Study IV: Chen EYT, Dickman PW, Di Mari F, Dahlén T, Stenke L, Björkholm M, Clements MS, Hao S. Empirical and projected economic burden of chronic myeloid leukaemia in Sweden from 2015–2030: a population-based study. British Journal of Haematology. 2025 (publication in process).
+
+The repository contains my PhD thesis and the corresponding code and papers for Studies I–IV at Karolinska Institutet.  
+**Author:** Enoch Yi-Tung Chen  
+**Title:** *Extrapolating survival with applications to health technology assessment*  
+**DOI:** [https://doi.org/10.69622/28869155](https://doi.org/10.69622/28869155)  
+**Dissertation date:** 11 September 2025  
+
+---
+
+### Study I  
+Chen EYT, Leontyeva Y, Lin CN, Wang JD, Clements MS, Dickman PW.  
+*Comparing survival extrapolation within all-cause and relative survival frameworks by standard parametric models and flexible parametric spline models using the Swedish Cancer Registry.*  
+**Medical Decision Making.** 2024; 44(3):269–282.  
+
+### Study II  
+Chen EYT, Dickman PW, Clements MS.  
+*A multistate model incorporating relative survival extrapolation and mixed time scales for health technology assessment.*  
+**PharmacoEconomics.** 2025; 43:297–310.  
+
+### Study III  
+Chen EYT, Dahlén T, Stenke L, Björkholm M, Hao S, Dickman PW, Clements MS.  
+*Loss in overall and quality-adjusted life expectancy for patients with chronic phase chronic myeloid leukemia.*  
+**European Journal of Haematology.** 2025; 114:334–342.  
+
+### Study IV  
+Chen EYT, Dickman PW, Di Mari F, Dahlén T, Stenke L, Björkholm M, Clements MS, Hao S.  
+*Empirical and projected economic burden of chronic myeloid leukaemia in Sweden from 2015–2030: a population-based study.*  
+**British Journal of Haematology.** 2025 (publication in process).  
 
 ## License
 Copyright © 2025. All rights reserved.<br>
