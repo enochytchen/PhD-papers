@@ -1,0 +1,452 @@
+<p>// Created: 2023-12-15 Enoch Chen: investigate the underlying reason of high upper bound of the CIs of the excess hazard of &ldquo;Transition 1L-TKI -&gt; Death&rdquo; and &ldquo;Transition TFR -&gt; Death&rdquo;</p>
+<h2><a href="#transition-5" id="transition-5">Transition 5</a></h2>
+<h3><a href="#strs" id="strs">strs</a></h3>
+<pre><code>. /*==============================
+&gt;  Transition 5: 1L-TKI -&gt; Death
+&gt; ==============================*/
+. // Read data
+. cd ../Data
+/Users/yitche/Library/CloudStorage/OneDrive-KarolinskaInstitutet/ec_phd/Study3_QALY/Data
+
+. use 02_studypop_msset.dta if trans == 5, clear
+(CML multi-state data merged with popmort2018)
+
+. 
+. // To avoid variable names same as strs
+. rename start start1
+
+. rename stop stop1
+
+. 
+. // stset
+. stset stop1, origin(start1) failure(status == 1) scale(365.24) id(idnr)
+
+Survival-time data settings
+
+           ID variable: idnr
+         Failure event: status==1
+Observed time interval: (stop1[_n-1], stop1]
+     Exit on or before: failure
+     Time for analysis: (time-origin)/365.24
+                Origin: time start1
+
+--------------------------------------------------------------------------
+      1,010  total observations
+          0  exclusions
+--------------------------------------------------------------------------
+      1,010  observations remaining, representing
+      1,010  subjects
+         97  failures in single-failure-per-subject data
+  3,137.348  total analysis time at risk and under observation
+                                                At risk from t =         0
+                                     Earliest observed entry t =         0
+                                          Last observed exit t =  11.87165
+
+. tab _d
+
+       1 if |
+ failure; 0 |
+if censored |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |        913       90.40       90.40
+          1 |         97        9.60      100.00
+------------+-----------------------------------
+      Total |      1,010      100.00
+
+. summarize _t
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+          _t |      1,010    3.106285    2.829896   .0027379   11.87165
+
+. 
+. // strs to estimate 10-year relative survival and related estimates
+. strs using popmort2018.dta, break(0(`=1/12')10) mergeby (_year sex _age) ///
+&gt;          diagyear(dxyear) diagage(dxage) notab ///
+&gt;          save(replace)
+
+        Failure _d: status==1
+  Analysis time _t: (stop1-origin)/365.24
+            Origin: time start1
+       ID variable: idnr
+
+No late entry detected - p is estimated using the actuarial method
+
+</code></pre>
+<pre><code>. // Read the results from strs
+. use grouped, clear
+(Collapsed (or grouped) survival data)
+
+. list start end n d d_star p p_star r cp cr_e2 if end &lt;=2
+
+     +--------------------------------------------------------------------------------+
+     | start     end      n   d   d_star        p   p_star        r       cp    cr_e2 |
+     |--------------------------------------------------------------------------------|
+  1. |     0   .0833   1010   0      1.4   1.0000   0.9986   1.0014   1.0000   1.0014 |
+  2. | .0833   .1667    998   3      1.3   0.9969   0.9986   0.9983   0.9969   0.9997 |
+  3. | .1667     .25    966   1      1.3   0.9990   0.9987   1.0003   0.9959   1.0000 |
+  4. |   .25   .3333    939   2      1.2   0.9978   0.9987   0.9992   0.9937   0.9991 |
+  5. | .3333   .4167    898   1      1.2   0.9989   0.9987   1.0002   0.9926   0.9993 |
+     |--------------------------------------------------------------------------------|
+  6. | .4167      .5    872   1      1.2   0.9988   0.9987   1.0002   0.9915   0.9995 |
+  7. |    .5   .5833    851   3      1.1   0.9964   0.9986   0.9978   0.9879   0.9973 |
+  8. | .5833   .6667    822   1      1.1   0.9988   0.9987   1.0001   0.9867   0.9974 |
+  9. | .6667     .75    797   2      1.0   0.9975   0.9987   0.9988   0.9842   0.9962 |
+ 10. |   .75   .8333    776   1      1.0   0.9987   0.9987   1.0000   0.9829   0.9962 |
+     |--------------------------------------------------------------------------------|
+ 11. | .8333   .9167    762   0      1.0   1.0000   0.9987   1.0013   0.9829   0.9976 |
+ 12. | .9167       1    749   3      1.0   0.9959   0.9987   0.9973   0.9789   0.9948 |
+ 13. |     1   1.083    724   0      1.1   1.0000   0.9985   1.0015   0.9789   0.9963 |
+ 14. | 1.083   1.167    707   2      1.0   0.9971   0.9985   0.9986   0.9761   0.9949 |
+ 15. | 1.167    1.25    676   1      1.0   0.9985   0.9985   1.0000   0.9746   0.9949 |
+     |--------------------------------------------------------------------------------|
+ 16. |  1.25   1.333    664   0      1.0   1.0000   0.9985   1.0015   0.9746   0.9963 |
+ 17. | 1.333   1.417    648   0      1.0   1.0000   0.9985   1.0015   0.9746   0.9978 |
+ 18. | 1.417     1.5    635   1      0.9   0.9984   0.9985   0.9999   0.9731   0.9977 |
+ 19. |   1.5   1.583    620   1      0.9   0.9984   0.9985   0.9999   0.9715   0.9976 |
+ 20. | 1.583   1.667    602   0      0.9   1.0000   0.9985   1.0015   0.9715   0.9991 |
+     |--------------------------------------------------------------------------------|
+ 21. | 1.667    1.75    588   1      0.9   0.9983   0.9985   0.9998   0.9698   0.9989 |
+ 22. |  1.75   1.833    578   1      0.9   0.9983   0.9985   0.9998   0.9681   0.9987 |
+ 23. | 1.833   1.917    567   2      0.8   0.9964   0.9985   0.9979   0.9647   0.9966 |
+ 24. | 1.917       2    551   1      0.8   0.9982   0.9985   0.9996   0.9629   0.9962 |
+     +--------------------------------------------------------------------------------+
+
+</code></pre>
+<p>Some <strong>d (deaths during the interval)</strong> was very close to lower than <strong>d_star(expected number of deahths)</strong>.</p>
+<h3><a href="#stpm2" id="stpm2">stpm2</a></h3>
+<pre><code>. // And now we prepare to fit an stpm2 model for the same data    
+. use 02_studypop_msset.dta if trans == 5, clear
+(CML multi-state data merged with popmort2018)
+
+. stset stop, origin(start) failure(status == 1) scale(365.24) id(idnr)
+
+Survival-time data settings
+
+           ID variable: idnr
+         Failure event: status==1
+Observed time interval: (stop[_n-1], stop]
+     Exit on or before: failure
+     Time for analysis: (time-origin)/365.24
+                Origin: time start
+
+--------------------------------------------------------------------------
+      1,010  total observations
+          0  exclusions
+--------------------------------------------------------------------------
+      1,010  observations remaining, representing
+      1,010  subjects
+         97  failures in single-failure-per-subject data
+  3,137.348  total analysis time at risk and under observation
+                                                At risk from t =         0
+                                     Earliest observed entry t =         0
+                                          Last observed exit t =  11.87165
+
+</code></pre>
+<pre><code>. // Fit an stpm2 excess hazard model
+. stpm2 ,df(3) bhazard(rate) scale(haz) // knot centile positions (33 67)
+
+Iteration 0:   log likelihood = -319.74813  
+Iteration 1:   log likelihood = -303.60214  
+Iteration 2:   log likelihood = -303.20283  
+Iteration 3:   log likelihood = -302.60545  
+Iteration 4:   log likelihood = -302.51399  
+Iteration 5:   log likelihood = -302.51386  
+Iteration 6:   log likelihood = -302.51386  
+
+Log likelihood = -302.51386                              Number of obs = 1,010
+
+------------------------------------------------------------------------------
+             | Coefficient  Std. err.      z    P&gt;|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+xb           |
+       _rcs1 |   9.472865   6.612915     1.43   0.152     -3.48821    22.43394
+       _rcs2 |   3.760564   3.662293     1.03   0.304    -3.417399    10.93853
+       _rcs3 |  -.3478035   .5195255    -0.67   0.503    -1.366055    .6704477
+       _cons |  -9.798567   4.043156    -2.42   0.015    -17.72301   -1.874127
+------------------------------------------------------------------------------
+
+</code></pre>
+<pre><code>. // Predict and plot
+. clear 
+
+. range _t 0 10 121 // First 10 years
+Number of observations (_N) was 0, now 121.
+
+. gen _d = .
+(121 missing values generated)
+
+. 
+. predict exh, haz ci timevar(_t)
+
+. 
+. tw (line exh _t, lcol(black)) ///
+&gt;    (rarea exh_uci exh_lci _t if exh_uci &lt; 1, color(blue%10)), ///
+&gt;    ylab(0 1) 
+
+</code></pre>
+<p><img src="graph1.png" height="400" ></p>
+<p>The model converged, but the upper bound of the confidence intervals was substantially high, especially in the beginning.</p>
+<h3><a href="#stpm2change-knot-position" id="stpm2change-knot-position">stpm2&ndash;change knot position</a></h3>
+<pre><code>. // And now we prepare to fit an stpm2 model for the same data    
+. use 02_studypop_msset.dta if trans == 5, clear
+(CML multi-state data merged with popmort2018)
+
+. stset stop, origin(start) failure(status == 1) scale(365.24) id(idnr)
+
+Survival-time data settings
+
+           ID variable: idnr
+         Failure event: status==1
+Observed time interval: (stop[_n-1], stop]
+     Exit on or before: failure
+     Time for analysis: (time-origin)/365.24
+                Origin: time start
+
+--------------------------------------------------------------------------
+      1,010  total observations
+          0  exclusions
+--------------------------------------------------------------------------
+      1,010  observations remaining, representing
+      1,010  subjects
+         97  failures in single-failure-per-subject data
+  3,137.348  total analysis time at risk and under observation
+                                                At risk from t =         0
+                                     Earliest observed entry t =         0
+                                          Last observed exit t =  11.87165
+
+</code></pre>
+<pre><code>. // Fit an stpm2 excess hazard model
+. stpm2 , bhazard(rate) scale(haz) knots(5 95) knscale(centile)
+
+Iteration 0:   log likelihood =  -320.5865  
+Iteration 1:   log likelihood = -303.77132  
+Iteration 2:   log likelihood = -303.28933  
+Iteration 3:   log likelihood = -302.60111  
+Iteration 4:   log likelihood = -302.35861  
+Iteration 5:   log likelihood = -302.35751  
+Iteration 6:   log likelihood = -302.35751  
+
+Log likelihood = -302.35751                              Number of obs = 1,010
+
+------------------------------------------------------------------------------
+             | Coefficient  Std. err.      z    P&gt;|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+xb           |
+       _rcs1 |   14.92334   10.00441     1.49   0.136    -4.684936    34.53162
+       _rcs2 |   9.003933   7.402533     1.22   0.224    -5.504765    23.51263
+       _rcs3 |  -.5957181   .7153638    -0.83   0.405    -1.997805    .8063691
+       _cons |  -12.28657   5.448392    -2.26   0.024    -22.96522   -1.607915
+------------------------------------------------------------------------------
+
+</code></pre>
+<pre><code>. // Predict and plot
+. clear 
+
+. range _t 0 10 121 // First 10 years
+Number of observations (_N) was 0, now 121.
+
+. gen _d = .
+(121 missing values generated)
+
+. 
+. predict exh, haz ci timevar(_t)
+
+. 
+. tw (line exh _t, lcol(black)) ///
+&gt;    (rarea exh_uci exh_lci _t if exh_uci &lt; 1, color(blue%10)), ///
+&gt;    ylab(0 1) 
+
+</code></pre>
+<p><img src="graph1.png" height="400" ></p>
+<p>Changing the knot position would induce the hazard shape to change, but it does not solve the issue that CIs may be extremely wide.</p>
+<h2><a href="#transition-14" id="transition-14">Transition 14</a></h2>
+<h3><a href="#strs" id="strs">strs</a></h3>
+<pre><code>. /*==============================
+&gt;  Transition 14: TFR -&gt; Death
+&gt; ==============================*/
+. // Read data
+. cd ../Data
+/Users/yitche/Library/CloudStorage/OneDrive-KarolinskaInstitutet/ec_phd/Study3_QALY/Data
+
+. 
+. use 02_studypop_msset.dta if trans == 14, clear
+(CML multi-state data merged with popmort2018)
+
+. 
+. rename start start1
+
+. rename stop stop1
+
+. 
+. // stset
+. stset stop1, origin(start1) failure(status == 1) scale(365.24) id(idnr)
+
+Survival-time data settings
+
+           ID variable: idnr
+         Failure event: status==1
+Observed time interval: (stop1[_n-1], stop1]
+     Exit on or before: failure
+     Time for analysis: (time-origin)/365.24
+                Origin: time start1
+
+--------------------------------------------------------------------------
+         71  total observations
+          0  exclusions
+--------------------------------------------------------------------------
+         71  observations remaining, representing
+         71  subjects
+          8  failures in single-failure-per-subject data
+    108.077  total analysis time at risk and under observation
+                                                At risk from t =         0
+                                     Earliest observed entry t =         0
+                                          Last observed exit t =  6.341036
+
+. tab _d
+
+       1 if |
+ failure; 0 |
+if censored |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |         63       88.73       88.73
+          1 |          8       11.27      100.00
+------------+-----------------------------------
+      Total |         71      100.00
+
+. summarize _t
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+          _t |         71     1.52221    1.684773   .0109517   6.341036
+
+. 
+. strs using popmort2018.dta, break(0(`=1/12')10) mergeby (_year sex _age) ///
+&gt;          diagyear(dxyear) diagage(dxage) notab ///
+&gt;          save(replace)
+
+        Failure _d: status==1
+  Analysis time _t: (stop1-origin)/365.24
+            Origin: time start1
+       ID variable: idnr
+
+No late entry detected - p is estimated using the actuarial method
+
+</code></pre>
+<pre><code>. use grouped, clear
+(Collapsed (or grouped) survival data)
+
+. list start end n d d_star p p_star r cp cr_e2 if end &lt;=2
+
+     +------------------------------------------------------------------------------+
+     | start     end    n   d   d_star        p   p_star        r       cp    cr_e2 |
+     |------------------------------------------------------------------------------|
+  1. |     0   .0833   71   0      0.1   1.0000   0.9990   1.0010   1.0000   1.0010 |
+  2. | .0833   .1667   70   0      0.1   1.0000   0.9990   1.0010   1.0000   1.0021 |
+  3. | .1667     .25   67   0      0.1   1.0000   0.9989   1.0011   1.0000   1.0032 |
+  4. |   .25   .3333   61   1      0.1   0.9831   0.9989   0.9842   0.9831   0.9873 |
+  5. | .3333   .4167   56   0      0.1   1.0000   0.9989   1.0011   0.9831   0.9884 |
+     |------------------------------------------------------------------------------|
+  6. | .4167      .5   53   0      0.1   1.0000   0.9989   1.0011   0.9831   0.9895 |
+  7. |    .5   .5833   45   0      0.0   1.0000   0.9990   1.0010   0.9831   0.9905 |
+  8. | .5833   .6667   40   0      0.0   1.0000   0.9989   1.0011   0.9831   0.9916 |
+  9. | .6667     .75   36   0      0.0   1.0000   0.9989   1.0011   0.9831   0.9927 |
+ 10. |   .75   .8333   33   1      0.0   0.9692   0.9989   0.9703   0.9528   0.9632 |
+     |------------------------------------------------------------------------------|
+ 11. | .8333   .9167   31   0      0.0   1.0000   0.9989   1.0011   0.9528   0.9643 |
+ 12. | .9167       1   29   0      0.0   1.0000   0.9990   1.0010   0.9528   0.9653 |
+ 13. |     1   1.083   28   1      0.0   0.9636   0.9988   0.9648   0.9182   0.9313 |
+ 14. | 1.083   1.167   26   0      0.0   1.0000   0.9988   1.0012   0.9182   0.9324 |
+ 15. | 1.167    1.25   26   0      0.0   1.0000   0.9988   1.0012   0.9182   0.9335 |
+     |------------------------------------------------------------------------------|
+ 16. |  1.25   1.333   26   0      0.0   1.0000   0.9988   1.0012   0.9182   0.9346 |
+ 17. | 1.333   1.417   25   0      0.0   1.0000   0.9988   1.0012   0.9182   0.9357 |
+ 18. | 1.417     1.5   24   0      0.0   1.0000   0.9987   1.0013   0.9182   0.9369 |
+ 19. |   1.5   1.583   23   0      0.0   1.0000   0.9987   1.0013   0.9182   0.9382 |
+ 20. | 1.583   1.667   23   1      0.0   0.9565   0.9987   0.9578   0.8782   0.8986 |
+     |------------------------------------------------------------------------------|
+ 21. | 1.667    1.75   22   0      0.0   1.0000   0.9990   1.0010   0.8782   0.8995 |
+ 22. |  1.75   1.833   22   0      0.0   1.0000   0.9990   1.0010   0.8782   0.9004 |
+ 23. | 1.833   1.917   20   0      0.0   1.0000   0.9989   1.0011   0.8782   0.9014 |
+ 24. | 1.917       2   20   0      0.0   1.0000   0.9989   1.0011   0.8782   0.9024 |
+     +------------------------------------------------------------------------------+
+
+</code></pre>
+<p>Some <strong>d (deaths during the interval)</strong> was very close to zero and lower than <strong>d_star(expected number of deahths)</strong>.</p>
+<h3><a href="#stpm2" id="stpm2">stpm2</a></h3>
+<pre><code>. // And now we prepare to fit an stpm2 model for the same data    
+. cd ../Data 
+/Users/yitche/Library/CloudStorage/OneDrive-KarolinskaInstitutet/ec_phd/Study3_QALY/Data
+
+. use 02_studypop_msset.dta if trans == 14, clear
+(CML multi-state data merged with popmort2018)
+
+. stset stop, origin(start) failure(status == 1) scale(365.24) id(idnr)
+
+Survival-time data settings
+
+           ID variable: idnr
+         Failure event: status==1
+Observed time interval: (stop[_n-1], stop]
+     Exit on or before: failure
+     Time for analysis: (time-origin)/365.24
+                Origin: time start
+
+--------------------------------------------------------------------------
+         71  total observations
+          0  exclusions
+--------------------------------------------------------------------------
+         71  observations remaining, representing
+         71  subjects
+          8  failures in single-failure-per-subject data
+    108.077  total analysis time at risk and under observation
+                                                At risk from t =         0
+                                     Earliest observed entry t =         0
+                                          Last observed exit t =  6.341036
+
+. 
+. stpm2 ,df(3) bhazard(rate) scale(haz)
+
+Iteration 0:   log likelihood = -26.375021  
+Iteration 1:   log likelihood =  -24.53337  
+Iteration 2:   log likelihood = -24.504094  
+Iteration 3:   log likelihood = -24.503822  
+Iteration 4:   log likelihood = -24.503822  
+
+Log likelihood = -24.503822                                 Number of obs = 71
+
+------------------------------------------------------------------------------
+             | Coefficient  Std. err.      z    P&gt;|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+xb           |
+       _rcs1 |   1.910032   1.095515     1.74   0.081    -.2371379    4.057201
+       _rcs2 |   .4163053   .8191193     0.51   0.611    -1.189139     2.02175
+       _rcs3 |  -.0902831   .3141874    -0.29   0.774    -.7060792    .5255129
+       _cons |  -3.827994   .9932548    -3.85   0.000    -5.774737    -1.88125
+------------------------------------------------------------------------------
+
+</code></pre>
+<pre><code>. clear 
+
+. range _t 0 10 121 // First 10 years
+Number of observations (_N) was 0, now 121.
+
+. gen _d = .
+(121 missing values generated)
+
+. 
+. predict exh, haz ci timevar(_t)
+
+</code></pre>
+<pre><code>. tw (line exh _t, lcol(black)) ///
+&gt;    (rarea exh_uci exh_lci _t if exh_uci &lt; 1, color(blue%10)), ///
+&gt;    ylab(0 1)
+
+</code></pre>
+<p><img src="graph2.png" height="400" ></p>
+<pre><code>
+// Export as a markdown
+cd ../Program
+
+dyndoc 12_evaluate_exch.do, replace
+</code></pre>
