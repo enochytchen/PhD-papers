@@ -26,7 +26,7 @@ Chen EYT, Dahlén T, Stenke L, Björkholm M, Hao S, Dickman PW, Clements MS.
 ### Study IV  
 Chen EYT, Dickman PW, Di Mari F, Dahlén T, Stenke L, Björkholm M, Clements MS, Hao S.  
 *Empirical and projected economic burden of chronic myeloid leukaemia in Sweden from 2015–2030: a population-based study.*  
-**British Journal of Haematology.** 2025 (publication in process).  
+**British Journal of Haematology.** 2025; 207(6):2441-2450.  
 
 ## License
 Copyright © 2025. All rights reserved.<br>
